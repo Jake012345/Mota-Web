@@ -1,67 +1,8 @@
-﻿Átugrás a tartalomra
-Csevegési előzmények
-
-Ezt mondtad:
-can you use shaders inn html
-A ChatGPT ezt mondta:
-———————————————
-Correct form: Can you use shaders in HTML
-Error: "inn" → should be "in"
-
-———————————————
-HTML önmagában nem tud shadereket futtatni, mert az csak egy jelölőnyelv (markup), nem grafikus motor. Viszont ha beépítesz WebGL-t (ami a böngészők OpenGL-szerű API-ja), akkor abban már írhatsz és futtathatsz GLSL shadereket.
-
-Pár lehetőség:
-
-WebGL → közvetlenül shader kódokat írhatsz (vertex + fragment). Ez a "nyers" módszer.
-
-Three.js vagy Babylon.js → magasabb szintű JavaScript frameworkök WebGL fölé, amik shader supportot is adnak.
-
-WebGPU → a jövő, modernebb, gyorsabb, mint a WebGL, szintén engedi saját shaderek futtatását.
-
-Szóval a válasz: közvetlenül HTML-ben nem, de HTML oldalba ágyazva JavaScript + WebGL/WebGPU segítségével simán megy a shaderes grafika.
-
-Ha akarod, mutathatok egy mini példát fragment shaderrel, ami a böngészőben egy színes hullámzó effektet rajzol. Szeretnéd?
-
-Ezt mondtad:
-web gpu?
-A ChatGPT ezt mondta:
-———————————————
-Correct form: WebGPU?
-Error: lowercase "web gpu" → should be "WebGPU" (proper noun / acronym)
-
-———————————————
-A WebGPU a WebGL modern utódja, amit mostanában kezdenek bevezetni a böngészőkbe (Chrome, Edge stabilan támogatja, Firefox és Safari még kísérleti módban). Ez lényegében a Vulkan/DirectX12/Metal stílusú API-k webes változata, tehát közelebb van a vas teljesítményéhez, és sokkal optimalizáltabb, mint a WebGL.
-
-Menőbb dolgai:
-
-Közvetlen GPU hozzáférés: több kontroll a memóriáról, pipeline-ról.
-
-Compute shader support: tehát nem csak rajzolni tudsz vele, hanem párhuzamos számításokat is futtathatsz a GPU-n.
-
-Jobb performance: közelebb áll a natív appok teljesítményéhez.
-
-Modern shader nyelv (WGSL): nem GLSL, hanem egy új, egyszerűbb nyelv.
-
-Használat közben úgy néz ki, mintha JavaScriptből készítenél egy pipeline-t, és abba "bedrótoznád" a WGSL shader kódot.
-
-Ha érdekel, összedobok neked egy egyszerű példát, ami csak egy WebGPU canvas-t csinál és kiírja egy színes háromszöget — kb. a "Hello World" megfelelője shaderekkel. Megmutassam?
-
-Ezt mondtad:
-yes
-A ChatGPT ezt mondta:
-———————————————
-Correct form: Yes
-Error: lowercase "yes" → should be capitalized
-
-———————————————
-Oké, itt egy nagyon alap WebGPU példa, ami egy háromszöget rajzol a canvasra. Ez a „Hello World” WebGPU-ban:
-
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>WebGPU Triangle</title>
+    <title>WebGPU Animated Shader</title>
     <style>
         body {
             margin: 0;
@@ -81,381 +22,109 @@ Oké, itt egy nagyon alap WebGPU példa, ami egy háromszöget rajzol a canvasra
 <body>
     <canvas id="gpu-canvas"></canvas>
     <script type="module">
-      async function init() {
-         if (!navigator.gpu) {
-            alert("WebGPU not supported in this browser!");
-            return;
-         }
+        async function init() {
+            if (!navigator.gpu) {
+                alert("WebGPU not supported in this browser!");
+                return;
+            }
 
-         const canvas = document.getElementById("gpu-canvas");
-         const adapter = await navigator.gpu.requestAdapter();
-         const device = await adapter.requestDevice();
-         const context = canvas.getContext("webgpu");
+            const canvas = document.getElementById("gpu-canvas");
+            const adapter = await navigator.gpu.requestAdapter();
+            const device = await adapter.requestDevice();
+            const context = canvas.getContext("webgpu");
 
-         const format = navigator.gpu.getPreferredCanvasFormat();
-         context.configure({ device, format });
+            const format = navigator.gpu.getPreferredCanvasFormat();
+            context.configure({ device, format });
 
-         // WGSL (WebGPU Shading Language) shader
-         const shader = device.createShaderModule({
-            code: `
-               @vertex
-               fn vs_main(@builtin(vertex_index) VertexIndex : u32) -> @builtin(position) vec4<f32> {
-                  var pos = array<vec2<f32>, 3>(
-                     vec2<f32>(0.0,  0.5),
-                     vec2<f32>(-0.5, -0.5),
-                     vec2<f32>(0.5, -0.5)
-                  );
-                  return vec4<f32>(pos[VertexIndex], 0.0, 1.0);
-               }
+            // WGSL shader: fullscreen triangle + animated fragment
+            const shader = device.createShaderModule({
+                code: `
+                   struct Uniforms {
+                      time : f32
+                   };
+                   @binding(0) @group(0) var<uniform> uniforms : Uniforms;
 
-               @fragment
-               fn fs_main() -> @location(0) vec4<f32> {
-                  return vec4<f32>(0.2, 0.8, 1.0, 1.0);
-               }
-            `
-         });
+                   @vertex
+                   fn vs_main(@builtin(vertex_index) VertexIndex : u32) -> @builtin(position) vec4<f32> {
+                      var pos = array<vec2<f32>, 6>(
+                         vec2<f32>(-1.0, -1.0),
+                         vec2<f32>( 1.0, -1.0),
+                         vec2<f32>(-1.0,  1.0),
+                         vec2<f32>(-1.0,  1.0),
+                         vec2<f32>( 1.0, -1.0),
+                         vec2<f32>( 1.0,  1.0)
+                      );
+                      return vec4<f32>(pos[VertexIndex], 0.0, 1.0);
+                   }
 
-         const pipeline = device.createRenderPipeline({
-            layout: "auto",
-            vertex: { module: shader, entryPoint: "vs_main" },
-            fragment: { module: shader, entryPoint: "fs_main", targets: [{ format }] },
-            primitive: { topology: "triangle-list" }
-         });
+                   @fragment
+                   fn fs_main(@builtin(position) fragCoord: vec4<f32>) -> @location(0) vec4<f32> {
+                      let uv = fragCoord.xy / vec2<f32>(600.0, 400.0); // normalize coords
+                      let t = uniforms.time * 0.001;
 
-         function frame() {
-            const encoder = device.createCommandEncoder();
-            const textureView = context.getCurrentTexture().createView();
-            const pass = encoder.beginRenderPass({
-               colorAttachments: [{
-                  view: textureView,
-                  clearValue: { r: 0.1, g: 0.1, b: 0.1, a: 1.0 },
-                  loadOp: "clear",
-                  storeOp: "store"
-               }]
+                      let wave = sin(uv.x * 10.0 + t) + cos(uv.y * 10.0 - t);
+                      let r = 0.5 + 0.5 * sin(wave + t);
+                      let g = 0.5 + 0.5 * sin(wave * 0.7 + t * 1.2);
+                      let b = 0.5 + 0.5 * cos(wave * 1.3 - t * 0.8);
+
+                      return vec4<f32>(r, g, b, 1.0);
+                   }
+                `
             });
 
-            pass.setPipeline(pipeline);
-            pass.draw(3);
-            pass.end();
+            // Uniform buffer (time)
+            const uniformBuffer = device.createBuffer({
+                size: 4,
+                usage: GPUBufferUsage.UNIFORM | GPUBufferUsage.COPY_DST
+            });
 
-            device.queue.submit([encoder.finish()]);
+            const bindGroupLayout = device.createBindGroupLayout({
+                entries: [{
+                    binding: 0,
+                    visibility: GPUShaderStage.FRAGMENT,
+                    buffer: { type: "uniform" }
+                }]
+            });
+
+            const bindGroup = device.createBindGroup({
+                layout: bindGroupLayout,
+                entries: [{ binding: 0, resource: { buffer: uniformBuffer } }]
+            });
+
+            const pipeline = device.createRenderPipeline({
+                layout: device.createPipelineLayout({ bindGroupLayouts: [bindGroupLayout] }),
+                vertex: { module: shader, entryPoint: "vs_main" },
+                fragment: { module: shader, entryPoint: "fs_main", targets: [{ format }] },
+                primitive: { topology: "triangle-list" }
+            });
+
+            function frame(time) {
+                device.queue.writeBuffer(uniformBuffer, 0, new Float32Array([time]));
+
+                const encoder = device.createCommandEncoder();
+                const textureView = context.getCurrentTexture().createView();
+                const pass = encoder.beginRenderPass({
+                    colorAttachments: [{
+                        view: textureView,
+                        clearValue: { r: 0, g: 0, b: 0, a: 1 },
+                        loadOp: "clear",
+                        storeOp: "store"
+                    }]
+                });
+
+                pass.setPipeline(pipeline);
+                pass.setBindGroup(0, bindGroup);
+                pass.draw(6);
+                pass.end();
+
+                device.queue.submit([encoder.finish()]);
+                requestAnimationFrame(frame);
+            }
+
             requestAnimationFrame(frame);
-         }
+        }
 
-         frame();
-      }
-
-      init();
+        init();
     </script>
 </body>
 </html>
-Ez a kód megnyit egy <canvas>
-    -t, konfigurálja WebGPU-ra, és egy egyszerű háromszöget rajzol egy fragment shaderrel, ami türkiz színben világít.
-
-    Ha futtatni akarod, kell Chrome vagy Edge legfrissebb verziója WebGPU flaggel engedélyezve (chrome://flags/#enable-unsafe-webgpu).
-
-    Szeretnéd, hogy mutassak egy kicsit menőbb példát is, mondjuk egy fragment shadert, ami animált színes hullámokat rajzol a canvason?
-
-    Ezt mondtad:
-    yes
-    A ChatGPT ezt mondta:
-    ———————————————
-    Correct form: Yes
-    Error: lowercase "yes" → should be capitalized
-
-    ———————————————
-    Na akkor itt egy fancybb WebGPU példa, ami nem csak egy háromszöget dob ki, hanem a teljes canvas-t feltölti egy animált hullámos shader effekttel. Ez a fragment shader minden pixel színét időfüggő szinuszhullámok alapján számolja:
-
-    <!DOCTYPE html>
-    <html lang="en">
-    <head>
-        <meta charset="UTF-8">
-        <title>WebGPU Animated Shader</title>
-        <style>
-            body {
-                margin: 0;
-                background: #111;
-                display: flex;
-                justify-content: center;
-                align-items: center;
-                height: 100vh;
-            }
-
-            canvas {
-                width: 600px;
-                height: 400px;
-            }
-        </style>
-    </head>
-    <body>
-        <canvas id="gpu-canvas"></canvas>
-        <script type="module">
-      async function init() {
-         if (!navigator.gpu) {
-            alert("WebGPU not supported in this browser!");
-            return;
-         }
-
-         const canvas = document.getElementById("gpu-canvas");
-         const adapter = await navigator.gpu.requestAdapter();
-         const device = await adapter.requestDevice();
-         const context = canvas.getContext("webgpu");
-
-         const format = navigator.gpu.getPreferredCanvasFormat();
-         context.configure({ device, format });
-
-         // WGSL shader: fullscreen triangle + animated fragment
-         const shader = device.createShaderModule({
-            code: `
-               struct Uniforms {
-                  time : f32
-               };
-               @binding(0) @group(0) var<uniform> uniforms : Uniforms;
-
-               @vertex
-               fn vs_main(@builtin(vertex_index) VertexIndex : u32) -> @builtin(position) vec4<f32> {
-                  var pos = array<vec2<f32>, 6>(
-                     vec2<f32>(-1.0, -1.0),
-                     vec2<f32>( 1.0, -1.0),
-                     vec2<f32>(-1.0,  1.0),
-                     vec2<f32>(-1.0,  1.0),
-                     vec2<f32>( 1.0, -1.0),
-                     vec2<f32>( 1.0,  1.0)
-                  );
-                  return vec4<f32>(pos[VertexIndex], 0.0, 1.0);
-               }
-
-               @fragment
-               fn fs_main(@builtin(position) fragCoord: vec4<f32>) -> @location(0) vec4<f32> {
-                  let uv = fragCoord.xy /
-
-
-
-Nincs fájl kiválasztvaNincs fájl kiválasztva
-A ChatGPT hibázhat. Fontold meg a fontos információk ellenőrzését. Lásd Cookie beállítások.
-A ChatGPT még választ generál…
-Átugrás a tartalomra
-Csevegési előzmények
-
-Ezt mondtad:
-can you use shaders inn html
-A ChatGPT ezt mondta:
-———————————————
-Correct form: Can you use shaders in HTML
-Error: "inn" → should be "in"
-
-———————————————
-HTML önmagában nem tud shadereket futtatni, mert az csak egy jelölőnyelv (markup), nem grafikus motor. Viszont ha beépítesz WebGL-t (ami a böngészők OpenGL-szerű API-ja), akkor abban már írhatsz és futtathatsz GLSL shadereket.
-
-Pár lehetőség:
-
-WebGL → közvetlenül shader kódokat írhatsz (vertex + fragment). Ez a "nyers" módszer.
-
-Three.js vagy Babylon.js → magasabb szintű JavaScript frameworkök WebGL fölé, amik shader supportot is adnak.
-
-WebGPU → a jövő, modernebb, gyorsabb, mint a WebGL, szintén engedi saját shaderek futtatását.
-
-Szóval a válasz: közvetlenül HTML-ben nem, de HTML oldalba ágyazva JavaScript + WebGL/WebGPU segítségével simán megy a shaderes grafika.
-
-Ha akarod, mutathatok egy mini példát fragment shaderrel, ami a böngészőben egy színes hullámzó effektet rajzol. Szeretnéd?
-
-Ezt mondtad:
-web gpu?
-A ChatGPT ezt mondta:
-———————————————
-Correct form: WebGPU?
-Error: lowercase "web gpu" → should be "WebGPU" (proper noun / acronym)
-
-———————————————
-A WebGPU a WebGL modern utódja, amit mostanában kezdenek bevezetni a böngészőkbe (Chrome, Edge stabilan támogatja, Firefox és Safari még kísérleti módban). Ez lényegében a Vulkan/DirectX12/Metal stílusú API-k webes változata, tehát közelebb van a vas teljesítményéhez, és sokkal optimalizáltabb, mint a WebGL.
-
-Menőbb dolgai:
-
-Közvetlen GPU hozzáférés: több kontroll a memóriáról, pipeline-ról.
-
-Compute shader support: tehát nem csak rajzolni tudsz vele, hanem párhuzamos számításokat is futtathatsz a GPU-n.
-
-Jobb performance: közelebb áll a natív appok teljesítményéhez.
-
-Modern shader nyelv (WGSL): nem GLSL, hanem egy új, egyszerűbb nyelv.
-
-Használat közben úgy néz ki, mintha JavaScriptből készítenél egy pipeline-t, és abba "bedrótoznád" a WGSL shader kódot.
-
-Ha érdekel, összedobok neked egy egyszerű példát, ami csak egy WebGPU canvas-t csinál és kiírja egy színes háromszöget — kb. a "Hello World" megfelelője shaderekkel. Megmutassam?
-
-Ezt mondtad:
-yes
-A ChatGPT ezt mondta:
-———————————————
-Correct form: Yes
-Error: lowercase "yes" → should be capitalized
-
-———————————————
-Oké, itt egy nagyon alap WebGPU példa, ami egy háromszöget rajzol a canvasra. Ez a „Hello World” WebGPU-ban:
-
-<!DOCTYPE html>
-<html lang="en">
-<head>
-   <meta charset="UTF-8">
-   <title>WebGPU Triangle</title>
-   <style>
-      body { margin: 0; background: #111; display: flex; justify-content: center; align-items: center; height: 100vh; }
-      canvas { width: 600px; height: 400px; }
-   </style>
-</head>
-<body>
-   <canvas id="gpu-canvas"></canvas>
-   <script type="module">
-      async function init() {
-         if (!navigator.gpu) {
-            alert("WebGPU not supported in this browser!");
-            return;
-         }
-
-         const canvas = document.getElementById("gpu-canvas");
-         const adapter = await navigator.gpu.requestAdapter();
-         const device = await adapter.requestDevice();
-         const context = canvas.getContext("webgpu");
-
-         const format = navigator.gpu.getPreferredCanvasFormat();
-         context.configure({ device, format });
-
-         // WGSL (WebGPU Shading Language) shader
-         const shader = device.createShaderModule({
-            code: `
-               @vertex
-               fn vs_main(@builtin(vertex_index) VertexIndex : u32) -> @builtin(position) vec4<f32> {
-                  var pos = array<vec2<f32>, 3>(
-                     vec2<f32>(0.0,  0.5),
-                     vec2<f32>(-0.5, -0.5),
-                     vec2<f32>(0.5, -0.5)
-                  );
-                  return vec4<f32>(pos[VertexIndex], 0.0, 1.0);
-               }
-
-               @fragment
-               fn fs_main() -> @location(0) vec4<f32> {
-                  return vec4<f32>(0.2, 0.8, 1.0, 1.0);
-               }
-            `
-         });
-
-         const pipeline = device.createRenderPipeline({
-            layout: "auto",
-            vertex: { module: shader, entryPoint: "vs_main" },
-            fragment: { module: shader, entryPoint: "fs_main", targets: [{ format }] },
-            primitive: { topology: "triangle-list" }
-         });
-
-         function frame() {
-            const encoder = device.createCommandEncoder();
-            const textureView = context.getCurrentTexture().createView();
-            const pass = encoder.beginRenderPass({
-               colorAttachments: [{
-                  view: textureView,
-                  clearValue: { r: 0.1, g: 0.1, b: 0.1, a: 1.0 },
-                  loadOp: "clear",
-                  storeOp: "store"
-               }]
-            });
-
-            pass.setPipeline(pipeline);
-            pass.draw(3);
-            pass.end();
-
-            device.queue.submit([encoder.finish()]);
-            requestAnimationFrame(frame);
-         }
-
-         frame();
-      }
-
-      init();
-        </script>
-    </body>
-</html>
-Ez a kód megnyit egy <canvas>
-    -t, konfigurálja WebGPU-ra, és egy egyszerű háromszöget rajzol egy fragment shaderrel, ami türkiz színben világít.
-
-    Ha futtatni akarod, kell Chrome vagy Edge legfrissebb verziója WebGPU flaggel engedélyezve (chrome://flags/#enable-unsafe-webgpu).
-
-    Szeretnéd, hogy mutassak egy kicsit menőbb példát is, mondjuk egy fragment shadert, ami animált színes hullámokat rajzol a canvason?
-
-    Ezt mondtad:
-    yes
-    A ChatGPT ezt mondta:
-    ———————————————
-    Correct form: Yes
-    Error: lowercase "yes" → should be capitalized
-
-    ———————————————
-    Na akkor itt egy fancybb WebGPU példa, ami nem csak egy háromszöget dob ki, hanem a teljes canvas-t feltölti egy animált hullámos shader effekttel. Ez a fragment shader minden pixel színét időfüggő szinuszhullámok alapján számolja:
-
-    <!DOCTYPE html>
-    <html lang="en">
-    <head>
-        <meta charset="UTF-8">
-        <title>WebGPU Animated Shader</title>
-        <style>
-            body {
-                margin: 0;
-                background: #111;
-                display: flex;
-                justify-content: center;
-                align-items: center;
-                height: 100vh;
-            }
-
-            canvas {
-                width: 600px;
-                height: 400px;
-            }
-        </style>
-    </head>
-    <body>
-        <canvas id="gpu-canvas"></canvas>
-        <script type="module">
-      async function init() {
-         if (!navigator.gpu) {
-            alert("WebGPU not supported in this browser!");
-            return;
-         }
-
-         const canvas = document.getElementById("gpu-canvas");
-         const adapter = await navigator.gpu.requestAdapter();
-         const device = await adapter.requestDevice();
-         const context = canvas.getContext("webgpu");
-
-         const format = navigator.gpu.getPreferredCanvasFormat();
-         context.configure({ device, format });
-
-         // WGSL shader: fullscreen triangle + animated fragment
-         const shader = device.createShaderModule({
-            code: `
-               struct Uniforms {
-                  time : f32
-               };
-               @binding(0) @group(0) var<uniform> uniforms : Uniforms;
-
-               @vertex
-               fn vs_main(@builtin(vertex_index) VertexIndex : u32) -> @builtin(position) vec4<f32> {
-                  var pos = array<vec2<f32>, 6>(
-                     vec2<f32>(-1.0, -1.0),
-                     vec2<f32>( 1.0, -1.0),
-                     vec2<f32>(-1.0,  1.0),
-                     vec2<f32>(-1.0,  1.0),
-                     vec2<f32>( 1.0, -1.0),
-                     vec2<f32>( 1.0,  1.0)
-                  );
-                  return vec4<f32>(pos[VertexIndex], 0.0, 1.0);
-               }
-
-               @fragment
-               fn fs_main(@builtin(position) fragCoord: vec4<f32>) -> @location(0) vec4<f32> {
-                  let uv = fragCoord.xy /
-
-
-
-Nincs fájl kiválasztvaNincs fájl kiválasztva
-A ChatGPT hibázhat. Fontold meg a fontos információk ellenőrzését. Lásd Cookie beállítások.
-A ChatGPT még választ generál…
