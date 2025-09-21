@@ -1,0 +1,10 @@
+body {
+    background-image: url("resources/media/pixelart_tile_waves_background.png");
+    background-repeat: repeat;
+    image-rendering: pixelated;
+}
+
+#title {
+    font-size: 20;
+    font-weight: bold;
+}
