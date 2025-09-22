@@ -1,4 +1,4 @@
-let page_who_we_are = "/res/pages/who_we_are.html"
+let page_who_we_are = "/Mota-Web/res/pages/who_we_are.html"
 
 
 

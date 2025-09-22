@@ -1,5 +1,5 @@
 body {
-    background-image: url("res/media/pixelart_tile_waves_background.png");
+    background-image: url("/Mota-Web/res/media/pixelart_tile_waves_background.png");
     background-repeat: repeat;
     image-rendering: pixelated;
 }
@@ -77,8 +77,8 @@ button:active {
     background: red;
     filter: blur(20px);
     opacity: 0.0;
-    mask: url(/res/media/icon-mask.png); /* csak a közép */
-    -webkit-mask: url(/res/media/icon-mask.png);
+    mask: url(/Mota-Web/res/media/icon-mask.png); /* csak a közép */
+    -webkit-mask: url(/Mota-Web/res/media/icon-mask.png);
     animation: pulse 1.5s infinite ease-in-out;
 }
 
