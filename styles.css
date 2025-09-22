@@ -89,12 +89,39 @@ button:active {
     }
 
     50% {
-        opacity: 0.3;
+        opacity: 0.4;
         filter: blur(25px);
     }
 
     100% {
         opacity: 0.1;
         filter: blur(10px);
+    }
+}
+
+@media (max-width: 600px) {
+    @keyframes pulse {
+        0% {
+            opacity: 0.2;
+            filter: blur(10px);
+        }
+
+        50% {
+            opacity: 0.4;
+            filter: blur(25px);
+        }
+
+        100% {
+            opacity: 0.2;
+            filter: blur(10px);
+        }
+    }
+
+    .icon {
+        width: 80%;
+    }
+    .glow {
+        width: 80%;
+        -webkit-mask-size: contain;
     }
 }
