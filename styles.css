@@ -1,10 +1,100 @@
 body {
-    background-image: url("resources/media/pixelart_tile_waves_background.png");
+    background-image: url("res/media/pixelart_tile_waves_background.png");
     background-repeat: repeat;
     image-rendering: pixelated;
 }
 
 #title {
-    font-size: 20;
+    font-size: 20pt;
     font-weight: bold;
+}
+
+header {
+    background-color: rgba(93, 93, 93, 0.70);
+    width: 100%;
+}
+
+button {
+    display: block;
+    background-color: rgb(0, 0, 0, 0.00);
+    border-color: rgb(0, 0, 0, 0.00);
+    transition: all 0.2s ease;
+}
+
+button:hover {
+    border-color: rgb(0, 0, 0, 1);
+    cursor: pointer;
+}
+
+button:active {
+    transform: scale(0.97);
+    cursor: pointer;
+}
+
+.header-button {
+    color: rgb(255, 255, 255, 0.8);
+    font-size: large;
+    font-style: italic;
+
+}
+
+.button-container {
+    display: flex;
+    flex-direction: row;
+    justify-content: left;
+    align-items: stretch;
+    gap: 10px;
+    padding: 10px;
+}
+
+.button-container button {
+    border-right: 2px solid #999;
+    padding: 10px 20px;
+    
+}
+
+.link-on-button {
+    display: inline-block;
+    width: 100%;
+    height: 100%;
+}
+
+.icon-wrapper {
+    position: relative;
+    display: inline-block;
+}
+
+.icon {
+    display: block;
+}
+
+.glow {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: red;
+    filter: blur(20px);
+    opacity: 0.0;
+    mask: url(/res/media/icon-mask.png); /* csak a közép */
+    -webkit-mask: url(/res/media/icon-mask.png);
+    animation: pulse 1.5s infinite ease-in-out;
+}
+
+@keyframes pulse {
+    0% {
+        opacity: 0.1;
+        filter: blur(10px);
+    }
+
+    50% {
+        opacity: 0.3;
+        filter: blur(25px);
+    }
+
+    100% {
+        opacity: 0.1;
+        filter: blur(10px);
+    }
 }
