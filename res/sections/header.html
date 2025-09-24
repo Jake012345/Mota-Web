@@ -1,19 +1,23 @@
-<header>
+<header class="magic-border">
     <script src="/Mota-Web/res/scripts/redirects.js"></script>
-    <div class="button-container">
+    <script src="/Mota-Web/res/scripts/image_button_fix.js"></script>
+    <script src="/Mota-Web/res/scripts/header_handler.js"></script>
+    <div class="button-container" style="display: none;">
         <a href="/Mota-Web/index.html">
-            <div class="icon-wrapper">
+            <div class="icon-wrapper" style="display: none;">
                 <img src="/Mota-Web/res/media/icon.png" alt="logo" class="icon">
                 <img src="/Mota-Web/res/media/icon-mask.png" class="glow" />
             </div>
         </a>
 
 
-        <button class="header-button" id="who_we_are_button" onclick="redirect_to(page_who_we_are)">
+        <button class="header-button" id="who_we_are_button" onclick="redirect_to(page_who_we_are)" style="display: none">
             Who we are
         </button>
-        <button class="header-button">
+        <button class="header-button" style="display:none">
             Button 2
         </button>
+
     </div>
+    <img src="/Mota-Web/res/media/header_arrow_down.png" class="arrow-down hover-effect" onclick=""/>
 </header>

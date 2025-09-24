@@ -11,7 +11,24 @@ body {
 
 header {
     background-color: rgba(93, 93, 93, 0.70);
-    width: 100%;
+    width: auto;
+    height: 20px;
+    overflow: visible;
+    text-align: center;
+    transition: height 1s ease-out !important;
+    padding: 0px !important;
+    z-index: 1000;
+}
+
+.header-expand {
+    height: 98vh;
+}
+
+#header_container {
+    top: 1vh;
+    position: sticky;
+    overflow: visible;
+    height: fit-content;
 }
 
 button {
@@ -42,7 +59,7 @@ button:active {
     display: flex;
     flex-direction: row;
     justify-content: left;
-    align-items: stretch;
+    align-items: center;
     gap: 10px;
     padding: 10px;
 }
@@ -124,4 +141,62 @@ button:active {
         width: 80%;
         -webkit-mask-size: contain;
     }
+}
+
+.arrow-down,
+.arrow-up {
+    position: absolute;
+    transform: translateY(-50%);
+    width: 50px;
+    height: 50px;
+    filter: drop-shadow(0, 0, 6px, rgb(255, 106, 0));
+    transition: transform 0.2s, filter 0.3s;
+    cursor: pointer;
+}
+
+img.hover-effect {
+    transition: filter 0.2s;
+}
+
+img.hover-effect.hover:hover {  /* handled on_hover test from JS*/
+    filter: brightness(1.2);
+    filter: drop-shadow(0, 0, rgb(255, 106, 0));
+    transform: translateY(-50%) scale(1.2);
+}
+
+img.hover-effect.hover:active {
+    filter: brightness(1.2);
+    filter: drop-shadow(0, 0, rgb(255, 106, 0));
+    transform: translateY(-50%) scale(0.9);
+
+}
+
+
+.magic-border {
+    position: relative;
+    padding: 1rem;
+    border-radius: 6px;
+    background-color: rgba(10,10,15,0.7);
+    color: #fff;
+    font-family: 'Press Start 2P', monospace;
+    transition: transform 0.2s;
+}
+
+.magic-border::before {
+    content: '';
+    position: absolute;
+    top: -4px;
+    left: -4px;
+    right: -4px;
+    bottom: -4px;
+    border: 3px solid #7f5f3f;
+    border-radius: 8px;
+    box-shadow: inset 0 0 0 2px #a08060, 0 0 6px #66ccff;
+    pointer-events: none;
+    image-rendering: pixelated;
+    transition: box-shadow 0.2s, transform 0.2s;
+}
+
+.magic-border:hover::before {
+    box-shadow: inset 0 0 0 2px #a08060, 0 0 12px 4px #66ccff;
 }
