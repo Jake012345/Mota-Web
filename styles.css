@@ -1,3 +1,17 @@
+
+:root {
+    interpolate-size: allow-keywords;
+}
+
+.hidden {
+    visibility: hidden;
+}
+
+.nano {
+    height: 0px;
+    width: 0px;
+}
+
 body {
     background-image: url("/Mota-Web/res/media/pixelart_tile_waves_background.png");
     background-repeat: repeat;
@@ -11,9 +25,10 @@ body {
 
 header {
     background-color: rgba(93, 93, 93, 0.70);
-    width: auto;
+    width: 95vw;
     height: 20px;
     overflow: visible;
+    justify-self: center;
     text-align: center;
     transition: height 1s ease-out !important;
     padding: 0px !important;
@@ -21,7 +36,7 @@ header {
 }
 
 .header-expand {
-    height: 98vh;
+    height: 95vh;
 }
 
 #header_container {
@@ -56,33 +71,36 @@ button:active {
 }
 
 .button-container {
-    display: flex;
-    flex-direction: row;
-    justify-content: left;
-    align-items: center;
-    gap: 10px;
-    padding: 10px;
+    position: relative;
+    height: 100% !important;
 }
 
 .button-container button {
     border-right: 2px solid #999;
     padding: 10px 20px;
-    
 }
 
-.link-on-button {
-    display: inline-block;
-    width: 100%;
-    height: 100%;
+.button-container * {
+   transition-duration: 0.1s;
 }
+
+.button-container img.under-cursor {
+    transform-origin: center;
+    transform: scale(1.1);
+}
+
 
 .icon-wrapper {
-    position: relative;
+    position: absolute;
     display: inline-block;
+    top: 50%;
+    transform: translate(-50%, -50%);
 }
 
 .icon {
     display: block;
+    width: fit-content;
+    height:fit-content;
 }
 
 .glow {
@@ -146,7 +164,8 @@ button:active {
 .arrow-down,
 .arrow-up {
     position: absolute;
-    transform: translateY(-50%);
+    transform: translate(-50%, -50%);
+    top: 100%;
     width: 50px;
     height: 50px;
     filter: drop-shadow(0, 0, 6px, rgb(255, 106, 0));
@@ -161,13 +180,13 @@ img.hover-effect {
 img.hover-effect.hover:hover {  /* handled on_hover test from JS*/
     filter: brightness(1.2);
     filter: drop-shadow(0, 0, rgb(255, 106, 0));
-    transform: translateY(-50%) scale(1.2);
+    transform: translate(-50%, -50%) scale(1.2);
 }
 
 img.hover-effect.hover:active {
     filter: brightness(1.2);
     filter: drop-shadow(0, 0, rgb(255, 106, 0));
-    transform: translateY(-50%) scale(0.9);
+    transform: translate(-50%, -50%) scale(0.9);
 
 }
 
