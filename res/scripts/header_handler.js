@@ -1,4 +1,9 @@
 let header = document.querySelector("header")
+
+document.querySelectorAll(".header-scaleable").forEach(element => {
+	element.classList.add("header-descaled")
+})
+
 function header_expand() {
 	header.classList.add("header-expand")
 	set_arrow_to("up")
@@ -19,7 +24,7 @@ document.addEventListener('mousemove', (e) => {
 
 	// Add highlight class to all elements
 	elements.forEach(el => {
-		if (el.nodeName != "a") {
+		if (el.nodeType != "A") {
 			el.classList.add('under-cursor');
 		};
 	});
@@ -30,64 +35,34 @@ function header_collapse() {
 	setTimeout(function () {
 		header.classList.remove("header-expand")
 		set_arrow_to("down")
-	}, 500);
+	}, 100);
 }
 
 function set_arrow_to(direction) {
-	header.querySelectorAll("img").forEach(arrow => {
-		if (arrow.classList.contains("arrow-up")) {
-			if (direction === "down") {
-				arrow.classList.add("hidden")
-			}
-			else {
-				arrow.classList.remove("hidden")
-			}
-		}
-		else {
-			if (arrow.classList.contains("arrow-down")) {
-				if (direction === "down") {
-					arrow.classList.remove("hidden")
-				}
-				else {
-					arrow.classList.add("hidden")
-				}
-			}
-		}
-	});
+	let arrow_up = header.querySelector(".arrow-up")
+	let arrow_down = header.querySelector(".arrow-down")
+	if (direction === "down") {
+		arrow_up.classList.add("hidden")
+		arrow_down.classList.remove("hidden")
+	}
+	else {
+		arrow_up.classList.remove("hidden")
+		arrow_down.classList.add("hidden")
+	}
 }
 
 function show_buttons() {
-	header.querySelectorAll("div").forEach(element => {
-		if (element.classList.contains("button-container")) {
-			element.classList.remove("hidden")
-			element.querySelectorAll(':scope > *').forEach(button => {
-				console.log(element.tagName)
-				if (button.tagName === "a") {
-					console.log(element)
-					button.firstChild.classList.remove("nano")
-				}
-				else {
-					button.classList.remove("nano")
-				}
-			});
-		}
-	});
+	header.querySelector(".button-container").classList.remove("hidden")
+	header.querySelectorAll(".header-scaleable").forEach(element => {
+		element.classList.remove("header-descaled")
+	})
 }
 
 function hide_buttons() {
-	header.querySelectorAll("div").forEach(element => {
-		if (element.classList.contains("button-container")) {
-			setTimeout(function () {
-				element.classList.add("hidden")
-			}, 0.2);
-			element.querySelectorAll(':scope > *').forEach(button => {
-				if (button.nodeType === "a") {
-					button.firstChild.nodeName.add("nano")
-				}
-				else {
-					button.classList.add("nano")
-				}
-			});
-		}
-	});
+	//		setTimeout(function () {
+	//			header.querySelector(".button-container").classList.add("hidden")
+	//		}, 1000);
+	header.querySelectorAll(".header-scaleable").forEach(element => {
+		element.classList.add("header-descaled")
+	})
 }
